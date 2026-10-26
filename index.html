@@ -168,6 +168,28 @@ nav button svg{width:18px;height:18px;vertical-align:-4px;margin-right:8px;strok
 .foot summary{cursor:pointer;font-weight:600;color:var(--ink)}
 .foot p,.foot li{margin:8px 0}
 .foot ul{padding-left:18px}
+/* ===== TEMA BIANCO E VERDE: testo verde scuro (leggibile), titoli e accenti verde chiaro ===== */
+:root:root:root{color-scheme:light;--bg:#fff;--surface:#fff;--ink:#1f6b3a;--muted:#3b7d54;--line:#d5f0dc;--accent:#7ddc98;--accent-ink:#0f3d1e;--chip:#effaf2;--gold:#2e9c58;--tomato:#1f6b3a;--verde:#4cc473}
+.brand,h2,.banner h2,.hero h1.slogan{color:var(--verde)}
+.hero{background:#fff;color:var(--ink);border-color:var(--line)}
+.hero h1 em{color:var(--gold)}
+.hero .lead,.hero .kpis b{color:var(--ink)}
+.hero .sub,.hero .kpis span{color:var(--muted)}
+.hero .cut{color:var(--ink);border-color:var(--line)}
+.hero .kpis{border-top-color:var(--line)}
+.hero .art{background:radial-gradient(circle,#f4fcf6,#fff);box-shadow:0 0 0 1px var(--gold),0 0 0 12px rgba(79,191,114,.08),0 30px 60px -20px rgba(30,100,60,.25)}
+.search{background:#f4fbf6;border-color:var(--line)}
+.search:focus-within{border-color:var(--gold);box-shadow:0 0 0 4px rgba(79,191,114,.15)}
+.search svg{stroke:var(--ink)}
+.search input{color:var(--ink)}
+.search input::placeholder{color:var(--muted)}
+.bar{background:#fff;color:var(--ink);border-color:var(--line);box-shadow:0 12px 30px -12px rgba(30,100,60,.25)}
+.bar .btn{background:var(--accent);color:var(--accent-ink)}
+.banner{background:var(--chip);color:var(--ink);border-color:var(--line)}
+.banner p{color:var(--ink)}
+.badge{background:rgba(255,255,255,.92);color:var(--ink);border-color:var(--gold)}
+.ph{background:linear-gradient(160deg,#f4fcf6,#e3f6e9)}
+.chips button.on{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
 </style>
 </head>
 <body>
