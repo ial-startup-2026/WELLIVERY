@@ -50,7 +50,7 @@ input,select,textarea{width:100%;font:inherit;color:var(--ink);background:var(--
 .code{font-family:Georgia,serif;font-size:34px;color:var(--tomato);margin:6px 0}
 .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
 </style>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Montserrat:wght@700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
 <style>
 :root{--bg:#efeeea;--surface:#fff;--ink:#0e1220;--muted:#6b6f78;--line:#e2e1dc;--accent:#0e1220;--accent-ink:#fff;--chip:#f3f2ef;--tomato:#0e1220}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1014;--surface:#171a20;--ink:#f3f4f6;--muted:#9aa0aa;--line:#272b33;--accent:#fff;--accent-ink:#0e1220;--chip:#21252d;--tomato:#f3f4f6}}
@@ -157,8 +157,9 @@ nav button svg{width:18px;height:18px;vertical-align:-4px;margin-right:8px;strok
 .rail{display:flex;gap:18px;overflow-x:auto;scroll-snap-type:x mandatory;margin:0 -16px;padding:4px 16px 22px;scrollbar-width:none}
 .rail .card{flex:0 0 270px;scroll-snap-align:start}
 .tier{font-family:"Plus Jakarta Sans",sans-serif;font-size:11px;font-weight:600;letter-spacing:.1em;color:var(--gold);margin-left:8px}
-.brand{font-family:var(--serif);font-size:clamp(24px,5vw,32px);font-weight:600;letter-spacing:.3em;text-transform:uppercase;color:#e9d9b5;margin:0 0 22px}
-.hero .lead{font-size:clamp(19px,3.4vw,24px);line-height:1.3;max-width:30ch}
+.brand{font-family:"Montserrat","Plus Jakarta Sans",sans-serif;font-size:clamp(38px,9vw,68px);font-weight:700;letter-spacing:.1em;line-height:1;text-transform:uppercase;color:#e9d9b5;margin:0 0 24px}
+.hero .lead{font-size:clamp(28px,5.6vw,46px);line-height:1.15;margin:0 0 14px}
+.hero h1.slogan{font-size:clamp(26px,4.5vw,38px);margin:30px 0 0}
 .chk{display:flex;gap:10px;align-items:flex-start;margin-top:18px;font-size:14px;font-weight:500;letter-spacing:0;text-transform:none;color:var(--ink)}
 .chk input{width:auto;margin-top:3px;flex:none}
 .chk a,.foot a{color:var(--gold);text-decoration:underline}
@@ -232,7 +233,7 @@ var DISH = {
 };
 art = function (id) { return '<svg viewBox="0 0 200 150" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><ellipse cx="100" cy="138" rx="66" ry="6" fill="#0e1220" opacity=".1"/>' + C(100, 72, 62, "#fff", "#e2e1dc") + (DISH[id] || DISH.b1)() + '</svg>'; };
 function hero() {
-  return '<section class="hero"><div><p class="brand">Wellivery</p><p class="kicker">' + greet() + '</p><h1>Your lunch.<br><em>Your time.</em><br>Your workplace.</h1><p class="lead">Prenota oggi, mangia sano domani: il pranzo arriva direttamente in ufficio.</p><p class="sub" style="text-transform:capitalize">' + tomorrow + '</p><span class="cut">Prenota entro le ' + CUTOFF + ' di oggi</span>' + searchHtml() + '<div class="kpis"><div><b>' + MENU.length + '</b><span>Piatti</span></div><div><b>' + SLOTS[0].split(" ")[0] + '</b><span>Prima consegna</span></div><div><b>In ufficio</b><span>Direttamente da te</span></div></div></div><div class="art">' + art("b1") + '</div></section>';
+  return '<section class="hero"><div><p class="brand">Wellivery</p><p class="lead">Prenota oggi, mangia sano domani: il pranzo arriva direttamente in ufficio.</p><p class="sub" style="text-transform:capitalize">' + tomorrow + '</p><span class="cut">Prenota entro le ' + CUTOFF + ' di oggi</span>' + searchHtml() + '<div class="kpis"><div><b>' + MENU.length + '</b><span>Piatti</span></div><div><b>' + SLOTS[0].split(" ")[0] + '</b><span>Prima consegna</span></div><div><b>In ufficio</b><span>Direttamente da te</span></div></div><h1 class="slogan">Your lunch.<br><em>Your time.</em><br>Your workplace.</h1></div><div class="art">' + art("b1") + '</div></section>';
 }
 var qty = {}, step = "menu", order = null, saved = {};
 try { saved = JSON.parse(localStorage.getItem("cliente") || "{}"); } catch (e) {}
