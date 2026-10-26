@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>VYTA APP</title>
+<title>Wellivery – Pranzi sani in azienda</title>
 <style>
 :root{color-scheme:light;--bg:#f6f1e7;--surface:#fffdf8;--ink:#1f2a1c;--muted:#6a7463;--line:#e4dccb;--accent:#2f6b3a;--accent-ink:#fff;--chip:#e6eed8;--tomato:#b8481f;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#141a13;--surface:#1c241b;--ink:#eef2e6;--muted:#9aa693;--line:#2c382a;--accent:#8fd19a;--accent-ink:#10200f;--chip:#273524;--tomato:#f0956f}}
@@ -157,6 +157,16 @@ nav button svg{width:18px;height:18px;vertical-align:-4px;margin-right:8px;strok
 .rail{display:flex;gap:18px;overflow-x:auto;scroll-snap-type:x mandatory;margin:0 -16px;padding:4px 16px 22px;scrollbar-width:none}
 .rail .card{flex:0 0 270px;scroll-snap-align:start}
 .tier{font-family:"Plus Jakarta Sans",sans-serif;font-size:11px;font-weight:600;letter-spacing:.1em;color:var(--gold);margin-left:8px}
+.brand{font-family:var(--serif);font-size:clamp(24px,5vw,32px);font-weight:600;letter-spacing:.3em;text-transform:uppercase;color:#e9d9b5;margin:0 0 22px}
+.hero .lead{font-size:clamp(19px,3.4vw,24px);line-height:1.3;max-width:30ch}
+.chk{display:flex;gap:10px;align-items:flex-start;margin-top:18px;font-size:14px;font-weight:500;letter-spacing:0;text-transform:none;color:var(--ink)}
+.chk input{width:auto;margin-top:3px;flex:none}
+.chk a,.foot a{color:var(--gold);text-decoration:underline}
+.demo{background:var(--chip);border:1px dashed var(--gold);border-radius:12px;padding:10px 14px;font-size:14px;margin:14px 0}
+.foot{margin-top:56px;border-top:1px solid var(--line);padding-top:16px;font-size:13px;color:var(--muted)}
+.foot summary{cursor:pointer;font-weight:600;color:var(--ink)}
+.foot p,.foot li{margin:8px 0}
+.foot ul{padding-left:18px}
 </style>
 </head>
 <body>
@@ -165,6 +175,15 @@ nav button svg{width:18px;height:18px;vertical-align:-4px;margin-right:8px;strok
 <script>
 // ===== MODIFICA QUI il menu del giorno =====
 var CUTOFF = "18:00";
+// ===== GOOGLE FORM: incolla qui i dati del tuo modulo (vedi GUIDA-GOOGLE-FORM.md) =====
+var FORM = {
+  action: "", // es. https://docs.google.com/forms/d/e/XXXXXXXX/formResponse
+  campi: {codice:"", nome:"", tel:"", azienda:"", reparto:"", slot:"", note:"", ordine:"", totale:"", consegna:"", consenso:""} // es. nome:"entry.123456789"
+};
+// Finché "action" è vuoto il sito è in modalità dimostrativa: l'ordine NON viene inviato a nessuno.
+var DEMO = !FORM.action;
+// Dati per l'informativa privacy: COMPILA prima di pubblicare il sito.
+var PRIVACY = {email:"DA COMPILARE (email del referente)", conservazione:"fino alla fine del progetto scolastico"};
 var SLOTS = ["12:00 – 12:30", "12:30 – 13:00", "13:00 – 13:30"];
 var MENU = [
  {id:"b1",cat:"Bowl",name:"Poke bowl di salmone",desc:"Riso integrale, salmone, edamame, avocado e sesamo",kcal:620,price:9.5,tags:["Pesce"]},
@@ -213,7 +232,7 @@ var DISH = {
 };
 art = function (id) { return '<svg viewBox="0 0 200 150" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><ellipse cx="100" cy="138" rx="66" ry="6" fill="#0e1220" opacity=".1"/>' + C(100, 72, 62, "#fff", "#e2e1dc") + (DISH[id] || DISH.b1)() + '</svg>'; };
 function hero() {
-  return '<section class="hero"><div><p class="kicker">' + greet() + '</p><h1>Your lunch.<br><em>Your time.</em><br>Your workplace.</h1><p class="lead">The future of lunch is here.</p><p class="sub" style="text-transform:capitalize">' + tomorrow + '</p><span class="cut">Prenota entro le ' + CUTOFF + ' di oggi</span>' + searchHtml() + '<div class="kpis"><div><b>' + MENU.length + '</b><span>Piatti</span></div><div><b>' + SLOTS[0].split(" ")[0] + '</b><span>Prima consegna</span></div><div><b>In ufficio</b><span>Direttamente da te</span></div></div></div><div class="art">' + art("b1") + '</div></section>';
+  return '<section class="hero"><div><p class="brand">Wellivery</p><p class="kicker">' + greet() + '</p><h1>Your lunch.<br><em>Your time.</em><br>Your workplace.</h1><p class="lead">Prenota oggi, mangia sano domani: il pranzo arriva direttamente in ufficio.</p><p class="sub" style="text-transform:capitalize">' + tomorrow + '</p><span class="cut">Prenota entro le ' + CUTOFF + ' di oggi</span>' + searchHtml() + '<div class="kpis"><div><b>' + MENU.length + '</b><span>Piatti</span></div><div><b>' + SLOTS[0].split(" ")[0] + '</b><span>Prima consegna</span></div><div><b>In ufficio</b><span>Direttamente da te</span></div></div></div><div class="art">' + art("b1") + '</div></section>';
 }
 var qty = {}, step = "menu", order = null, saved = {};
 try { saved = JSON.parse(localStorage.getItem("cliente") || "{}"); } catch (e) {}
@@ -225,8 +244,21 @@ var cats = MENU.map(function (m) { return m.cat; }).filter(function (c, i, a) { 
 function items() { return MENU.filter(function (m) { return qty[m.id] > 0; }); }
 function count() { return items().reduce(function (s, m) { return s + qty[m.id]; }, 0); }
 function total() { return items().reduce(function (s, m) { return s + qty[m.id] * m.price; }, 0); }
+function demoNote() { return DEMO ? '<p class="demo"><strong>Versione dimostrativa:</strong> l’ordine non viene ancora inviato a nessuno.</p>' : ""; }
+function foot() {
+  return '<footer class="foot"><details id="privacy"><summary>Informativa privacy</summary>' +
+  '<p><strong>Chi siamo.</strong> Wellivery è un progetto didattico della Scuola Alberghiera IAL di Serramazzoni. Per qualsiasi richiesta sui tuoi dati scrivi a: ' + esc(PRIVACY.email) + '.</p>' +
+  '<p><strong>Quali dati raccogliamo.</strong> Nome e cognome, telefono, azienda, piano o reparto, fascia di consegna e le note che scrivi.</p>' +
+  '<p><strong>Perché.</strong> Solo per preparare e consegnare il tuo ordine e per contattarti se serve. Non li usiamo per pubblicità e non li diamo ad altri.</p>' +
+  '<p><strong>Allergie e salute.</strong> Il campo “Note o allergie” può contenere informazioni sulla salute: scrivile solo se vuoi che ne teniamo conto.</p>' +
+  '<p><strong>Per quanto tempo.</strong> Conserviamo i dati ' + esc(PRIVACY.conservazione) + '.</p>' +
+  '<p><strong>Sul tuo telefono o computer.</strong> Per farti compilare più in fretta la prossima volta, nome, telefono, azienda e reparto restano salvati nel tuo browser e non vengono inviati. Li cancelli eliminando i dati del sito dal browser.</p>' +
+  '<p><strong>I tuoi diritti.</strong> Puoi chiedere di vedere, correggere o cancellare i tuoi dati scrivendo all’indirizzo qui sopra.</p>' +
+  '<p><strong>Servizi esterni.</strong> I caratteri di scrittura sono caricati da Google Fonts, che può ricevere il tuo indirizzo IP.' + (DEMO ? '' : ' Quando invii l’ordine, i dati vengono salvati in un modulo e in un foglio Google (Google Forms e Google Sheets) gestiti dal referente del progetto, quindi sono trattati anche da Google.') + '</p></details>' +
+  '<p>Wellivery · progetto didattico</p></footer>';
+}
 function head() {
-  return '<header><p class="kicker">Pranzo sano in azienda</p><h1>Menu di domani</h1><p class="sub" style="text-transform:capitalize">' + tomorrow + '</p><span class="cut">Prenota entro le ' + CUTOFF + ' di oggi</span></header>';
+  return '<header><p class="kicker">Wellivery · Pranzo sano in azienda</p><h1>Menu di domani</h1><p class="sub" style="text-transform:capitalize">' + tomorrow + '</p><span class="cut">Prenota entro le ' + CUTOFF + ' di oggi</span></header>';
 }
 function card(m) {
   var q = qty[m.id] || 0;
@@ -272,30 +304,32 @@ function menuView() {
   var secs = cats.map(function (c) {
     return '<section id="sec-' + c + '"><h2>' + c + '</h2><div class="grid">' + MENU.filter(function (m) { return m.cat === c; }).map(card).join("") + '</div></section>';
   }).join("");
-  return hero() + chipsHtml() + nav + '<div id="res">' + results() + '</div><section class="banner"><h2>Pranzo sano, senza uscire dall’ufficio.</h2><p>Prenota entro le ' + CUTOFF + ' e ricevi domani direttamente alla tua scrivania.</p></section>';
+  return demoNote() + hero() + chipsHtml() + nav + '<div id="res">' + results() + '</div><section class="banner"><h2>Pranzo sano, senza uscire dall’ufficio.</h2><p>Prenota entro le ' + CUTOFF + ' e ricevi domani direttamente alla tua scrivania.</p></section>';
 }
 function formView() {
   var lines = items().map(function (m) { return '<div><span>' + qty[m.id] + ' × ' + m.name + '</span><span>' + eur(qty[m.id] * m.price) + '</span></div>'; }).join("");
   var opts = SLOTS.map(function (s) { return '<option' + (saved.slot === s ? " selected" : "") + '>' + s + '</option>'; }).join("");
-  return head() + '<h2>Il tuo ordine</h2><div class="sum">' + lines + '<div class="tot"><span>Totale</span><span>' + eur(total()) + '</span></div></div>' +
+  return head() + demoNote() + '<h2>Il tuo ordine</h2><div class="sum">' + lines + '<div class="tot"><span>Totale</span><span>' + eur(total()) + '</span></div></div>' +
   '<h2>Dove consegniamo</h2><form id="f"><div class="two"><div><label for="n">Nome e cognome</label><input id="n" required autocomplete="name" value="' + esc(saved.nome || "") + '"></div>' +
   '<div><label for="t">Telefono</label><input id="t" type="tel" required autocomplete="tel" value="' + esc(saved.tel || "") + '"></div>' +
   '<div><label for="a">Azienda</label><input id="a" required value="' + esc(saved.azienda || "") + '"></div>' +
   '<div><label for="r">Piano / reparto</label><input id="r" placeholder="es. 2° piano, Amministrazione" value="' + esc(saved.reparto || "") + '"></div></div>' +
   '<label for="s">Fascia di consegna</label><select id="s">' + opts + '</select>' +
   '<label for="x">Note o allergie</label><textarea id="x" rows="3" placeholder="es. senza noci, salsa a parte"></textarea>' +
-  '<div class="actions"><button class="btn" type="submit">Conferma prenotazione</button><button class="btn ghost" type="button" data-act="back">Torna al menu</button></div></form>';
+  '<label class="chk"><input type="checkbox" id="pv" required><span>Ho letto l’<a href="#privacy" data-act="privacy">informativa privacy</a> e acconsento al trattamento dei miei dati per gestire l’ordine.</span></label>' +
+  '<p class="demo" id="err" role="alert" hidden>Non siamo riusciti a inviare l’ordine. Controlla la connessione e riprova.</p>' +
+  '<div class="actions"><button class="btn" type="submit">' + (DEMO ? "Vedi riepilogo" : "Conferma prenotazione") + '</button><button class="btn ghost" type="button" data-act="back">Torna al menu</button></div></form>';
 }
 function doneView() {
   var o = order;
   var lines = o.rows.map(function (r) { return '<div><span>' + r.q + ' × ' + r.name + '</span><span>' + eur(r.q * r.price) + '</span></div>'; }).join("");
-  return head() + '<h2>Prenotazione confermata</h2><p class="sub">Il tuo codice ordine</p><div class="code">' + o.code + '</div>' +
+  return head() + '<h2>' + (DEMO ? 'Riepilogo dell’ordine' : 'Prenotazione inviata') + '</h2>' + demoNote() + (DEMO ? "" : '<p class="sub">Il tuo codice ordine</p><div class="code">' + o.code + '</div>') +
   '<div class="sum">' + lines + '<div class="tot"><span>Totale</span><span>' + eur(o.tot) + '</span></div></div>' +
   '<p>Consegna per <strong>' + esc(o.nome) + '</strong> presso <strong>' + esc(o.azienda) + '</strong>' + (o.reparto ? ' (' + esc(o.reparto) + ')' : '') + ', domani tra le <strong>' + o.slot + '</strong>.</p>' +
   '<div class="actions"><button class="btn" data-act="new">Nuovo ordine</button></div>';
 }
 function render() {
-  app.innerHTML = '<div style="display:none"></div>' + (step === "menu" ? menuView() : step === "form" ? formView() : doneView());
+  app.innerHTML = '<div style="display:none"></div>' + (step === "menu" ? menuView() : step === "form" ? formView() : doneView()) + foot();
   var n = count();
   bar.className = "bar" + (step === "menu" && n ? " on" : "");
   document.getElementById("barinfo").innerHTML = '<strong>' + n + (n === 1 ? " piatto" : " piatti") + '</strong> · ' + eur(total());
@@ -306,16 +340,30 @@ function submit(e) {
   e.preventDefault();
   var v = function (id) { return document.getElementById(id).value.trim(); };
   var data = {nome:v("n"), tel:v("t"), azienda:v("a"), reparto:v("r"), slot:v("s")};
-  try { localStorage.setItem("cliente", JSON.stringify(data)); } catch (er) {}
-  saved = data; try { localStorage.setItem("ultimo", JSON.stringify(items().map(function (m) { return m.id; }))); } catch (er2) {}
-  order = {code:"PS-" + (1000 + Math.floor(Math.random() * 9000)), nome:data.nome, azienda:data.azienda, reparto:data.reparto, slot:data.slot, note:v("x"),
+  var o = {code:"W-" + (1000 + Math.floor(Math.random() * 9000)), nome:data.nome, azienda:data.azienda, reparto:data.reparto, slot:data.slot, note:v("x"),
     rows:items().map(function (m) { return {q:qty[m.id], name:m.name, price:m.price}; }), tot:total()};
-  // Qui andrà l'invio reale dell'ordine al tuo sistema (API/backend).
-  step = "done"; render(); window.scrollTo(0, 0);
+  var fine = function () {
+    try { localStorage.setItem("cliente", JSON.stringify(data)); } catch (er) {}
+    saved = data; try { localStorage.setItem("ultimo", JSON.stringify(items().map(function (m) { return m.id; }))); } catch (er2) {}
+    order = o; step = "done"; render(); window.scrollTo(0, 0);
+  };
+  if (DEMO) return fine();
+  // Invio reale dell'ordine al Google Form (le risposte finiscono nel Google Sheet collegato).
+  var btn = e.target.querySelector('button[type="submit"]'), err = document.getElementById("err");
+  btn.disabled = true; btn.textContent = "Invio in corso…"; err.hidden = true;
+  var body = new URLSearchParams(), c = FORM.campi;
+  var put = function (k, val) { if (c[k]) body.append(c[k], val); };
+  put("codice", o.code); put("nome", o.nome); put("tel", data.tel); put("azienda", o.azienda); put("reparto", o.reparto); put("slot", o.slot); put("note", o.note);
+  put("ordine", o.rows.map(function (r) { return r.q + " × " + r.name; }).join("\n")); put("totale", eur(o.tot));
+  put("consegna", new Date(Date.now() + 864e5).toLocaleDateString("it-IT")); put("consenso", "Sì");
+  fetch(FORM.action, {method:"POST", mode:"no-cors", body:body}).then(fine).catch(function () {
+    btn.disabled = false; btn.textContent = "Conferma prenotazione"; err.hidden = false;
+  });
 }
 document.addEventListener("click", function (e) {
   var b = e.target.closest("[data-act]"); if (!b) return;
   var act = b.dataset.act, id = b.dataset.id;
+  if (act === "privacy") { e.preventDefault(); var pv = document.getElementById("privacy"); pv.open = true; pv.scrollIntoView({behavior:"smooth"}); return; }
   if (act === "inc") qty[id] = (qty[id] || 0) + 1;
   else if (act === "dec") qty[id] = Math.max(0, (qty[id] || 0) - 1);
   else if (act === "go") { var el = document.getElementById("sec-" + id); if (el) el.scrollIntoView({behavior:"smooth"}); return; }
