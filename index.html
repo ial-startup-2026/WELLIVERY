@@ -246,6 +246,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--verde);box-shadow:0 0
 .banner{background:var(--verde);color:#fff;border:0;border-radius:50% 50% 24px 24px/36px 36px 24px 24px;padding:60px 28px 40px}
 .banner h2,.banner p{color:#fff}
 .banner p{opacity:.95}
+.addr{display:flex;gap:8px;flex-wrap:wrap}.addr input{flex:1;min-width:200px}.maps{padding:10px 16px;white-space:nowrap;font-size:13px}.hint{font-size:12px;color:var(--muted);margin:6px 0 0}
 .ph img,.hero .art img{width:100%;height:100%;object-fit:cover;display:block}
 </style>
 </head>
@@ -258,7 +259,7 @@ var CUTOFF = "18:00";
 // ===== GOOGLE FORM: incolla qui i dati del tuo modulo (vedi GUIDA-GOOGLE-FORM.md) =====
 var FORM = {
   action: "", // es. https://docs.google.com/forms/d/e/XXXXXXXX/formResponse
-  campi: {codice:"", nome:"", tel:"", azienda:"", reparto:"", slot:"", note:"", ordine:"", totale:"", consegna:"", consenso:""} // es. nome:"entry.123456789"
+  campi: {codice:"", nome:"", tel:"", azienda:"", indirizzo:"", reparto:"", slot:"", note:"", ordine:"", totale:"", consegna:"", consenso:""} // es. nome:"entry.123456789"
 };
 // Finché "action" è vuoto il sito è in modalità dimostrativa: l'ordine NON viene inviato a nessuno.
 var DEMO = !FORM.action;
@@ -266,16 +267,12 @@ var DEMO = !FORM.action;
 var PRIVACY = {email:"DA COMPILARE (email del referente)", conservazione:"fino alla fine del progetto scolastico"};
 var SLOTS = ["12:00 – 12:30", "12:30 – 13:00", "13:00 – 13:30"];
 var MENU = [
- {id:"b1",cat:"Bowl",name:"Poke bowl di salmone",desc:"Riso integrale, salmone, edamame, avocado e sesamo",kcal:620,price:9.5,tags:["Pesce"]},
- {id:"b2",cat:"Bowl",name:"Buddha bowl vegana",desc:"Quinoa, ceci, zucca arrosto, hummus e semi di girasole",kcal:540,price:8.5,tags:["Vegano","Senza lattosio"]},
- {id:"p1",cat:"Primi",name:"Farro con verdure grigliate",desc:"Farro perlato, zucchine, peperoni, feta e menta",kcal:480,price:8,tags:["Vegetariano"]},
- {id:"p2",cat:"Primi",name:"Zuppa di lenticchie",desc:"Lenticchie, finocchietto, carote e olio extravergine",kcal:350,price:6.5,tags:["Vegano","Senza glutine"]},
- {id:"s1",cat:"Secondi",name:"Pollo al limone",desc:"Petto di pollo al forno con purè di cavolfiore",kcal:450,price:9,tags:["Senza glutine"]},
- {id:"s2",cat:"Secondi",name:"Frittata di zucchine",desc:"Uova, zucchine e erbe fresche, con insalata mista",kcal:380,price:7.5,tags:["Vegetariano","Senza glutine"]},
- {id:"i1",cat:"Insalate",name:"Tonno, fagioli e cipolla",desc:"Tonno al naturale, cannellini, cipolla di Tropea, rucola",kcal:410,price:8,tags:["Pesce","Senza glutine"]},
- {id:"i2",cat:"Insalate",name:"Spinaci, pere e noci",desc:"Spinacino, pera, noci, grana e aceto balsamico",kcal:330,price:7.5,tags:["Vegetariano","Senza glutine"]},
- {id:"d1",cat:"Dessert",name:"Yogurt greco e frutti di bosco",desc:"Yogurt magro, mirtilli, lamponi e un filo di miele",kcal:180,price:3.5,tags:["Vegetariano","Senza glutine"]},
- {id:"d2",cat:"Dessert",name:"Macedonia di stagione",desc:"Frutta fresca tagliata al momento",kcal:120,price:3,tags:["Vegano","Senza glutine"]}
+ {id:"b1",cat:"Bowl",name:"Poke bowl di salmone",desc:"Riso integrale, salmone, edamame, avocado e sesamo",kcal:620,price:11,tags:["Pesce"]},
+ {id:"b2",cat:"Bowl",name:"Buddha bowl vegana",desc:"Quinoa, ceci, zucca arrosto, hummus e semi di girasole",kcal:540,price:10,tags:["Vegano","Senza lattosio"]},
+ {id:"p1",cat:"Primi",name:"Farro con verdure grigliate",desc:"Farro perlato, zucchine, peperoni, feta e menta",kcal:480,price:9.5,tags:["Vegetariano"]},
+ {id:"i1",cat:"Insalate",name:"Tonno, fagioli e cipolla",desc:"Tonno al naturale, cannellini, cipolla di Tropea, rucola",kcal:410,price:9.5,tags:["Pesce","Senza glutine"]},
+ {id:"i2",cat:"Insalate",name:"Spinaci, pere e noci",desc:"Spinacino, pera, noci, grana e aceto balsamico",kcal:330,price:9,tags:["Vegetariano","Senza glutine"]},
+ {id:"d2",cat:"Dessert",name:"Macedonia di stagione",desc:"Frutta fresca tagliata al momento",kcal:120,price:4.5,tags:["Vegano","Senza glutine"]}
 ];
 // ===========================================
 var EMO = {Bowl:"🥗",Primi:"🍲",Secondi:"🍗",Insalate:"🥬",Dessert:"🍓"};
@@ -347,7 +344,7 @@ function card(m) {
 }
 function tier(p) { return p < 6 ? "€" : p < 8.5 ? "€€" : "€€€"; }
 var CHEF = ["b2", "p1", "s1", "i2"], TREND = ["b1", "s1", "d1", "i1"];
-var FILTERS = [["", "Tutti"], ["Vegano", "Vegano"], ["Vegetariano", "Vegetariano"], ["Senza glutine", "Senza glutine"], ["Pesce", "Pesce"], ["light", "Sotto 450 kcal"]];
+var FILTERS = [["", "Tutti"], ["Vegano", "Vegano"], ["Vegetariano", "Vegetariano"], ["Pesce", "Pesce"], ["light", "Sotto 450 kcal"]];
 var ICON = {
  Bowl: '<svg viewBox="0 0 24 24"><path d="M3 11h18a9 9 0 0 1-18 0zM8 7c0-2 2-2 2-4M13 7c0-2 2-2 2-4"/></svg>',
  Primi: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M8 12a4 4 0 0 1 8 0M10 15a2 2 0 0 1 4 0"/></svg>',
@@ -376,7 +373,7 @@ function results() {
   }
   var li = lastIds();
   return (li.length ? rail("Ordina di nuovo", byIds(li)) : rail("Consigliati per iniziare", byIds(["b1", "b2", "s1", "i2"]))) +
-    rail("La selezione dello chef", byIds(CHEF)) + rail("I più richiesti", byIds(TREND)) + rail("Leggeri, sotto 400 kcal", MENU.filter(function (m) { return m.kcal < 400; })) +
+    rail("La selezione dello chef", byIds(CHEF)) + rail("Leggeri, sotto 400 kcal", MENU.filter(function (m) { return m.kcal < 400; })) +
     cats.map(function (c) { return '<section id="sec-' + c + '"><h2>' + c + '</h2><div class="grid">' + MENU.filter(function (m) { return m.cat === c; }).map(card).join("") + '</div></section>'; }).join("");
 }
 function menuView() {
@@ -393,7 +390,8 @@ function formView() {
   '<h2>Dove consegniamo</h2><form id="f"><div class="two"><div><label for="n">Nome e cognome</label><input id="n" required autocomplete="name" value="' + esc(saved.nome || "") + '"></div>' +
   '<div><label for="t">Telefono</label><input id="t" type="tel" required autocomplete="tel" value="' + esc(saved.tel || "") + '"></div>' +
   '<div><label for="a">Azienda o palestra</label><input id="a" required value="' + esc(saved.azienda || "") + '"></div>' +
-  '<div><label for="r">Piano / reparto</label><input id="r" placeholder="es. 2° piano, Amministrazione" value="' + esc(saved.reparto || "") + '"></div></div>' +
+    '<div><label for="r">Piano / reparto</label><input id="r" placeholder="es. 2° piano, Amministrazione" value="' + esc(saved.reparto || "") + '"></div></div>' +
+  '<div style="grid-column:1/-1"><label for="ind">Indirizzo di consegna</label><div class="addr"><input id="ind" required autocomplete="street-address" placeholder="Via, numero civico, città" value="' + esc(saved.ind || "") + '"><button class="btn maps" type="button" data-act="maps">📍 Cerca su Google Maps</button></div><p class="hint">Cerca il posto su Google Maps, copia l’indirizzo completo e incollalo qui.</p></div>' +
   '<label for="s">Fascia di consegna</label><select id="s">' + opts + '</select>' +
   '<label for="x">Note o allergie</label><textarea id="x" rows="3" placeholder="es. senza noci, salsa a parte"></textarea>' +
   '<label class="chk"><input type="checkbox" id="pv" required><span>Ho letto l’<a href="#privacy" data-act="privacy">informativa privacy</a> e acconsento al trattamento dei miei dati per gestire l’ordine.</span></label>' +
@@ -405,7 +403,7 @@ function doneView() {
   var lines = o.rows.map(function (r) { return '<div><span>' + r.q + ' × ' + r.name + '</span><span>' + eur(r.q * r.price) + '</span></div>'; }).join("");
   return head() + '<h2>' + (DEMO ? 'Riepilogo dell’ordine' : 'Prenotazione inviata') + '</h2>' + demoNote() + (DEMO ? "" : '<p class="sub">Il tuo codice ordine</p><div class="code">' + o.code + '</div>') +
   '<div class="sum">' + lines + '<div class="tot"><span>Totale</span><span>' + eur(o.tot) + '</span></div></div>' +
-  '<p>Consegna per <strong>' + esc(o.nome) + '</strong> presso <strong>' + esc(o.azienda) + '</strong>' + (o.reparto ? ' (' + esc(o.reparto) + ')' : '') + ', domani tra le <strong>' + o.slot + '</strong>.</p>' +
+  '<p>Consegna per <strong>' + esc(o.nome) + '</strong> presso <strong>' + esc(o.azienda) + '</strong>, ' + esc(o.ind) +  (o.reparto ? ' (' + esc(o.reparto) + ')' : '') + ', domani tra le <strong>' + o.slot + '</strong>.</p>' +
   '<div class="actions"><button class="btn" data-act="new">Nuovo ordine</button></div>';
 }
 function render() {
@@ -419,8 +417,8 @@ function render() {
 function submit(e) {
   e.preventDefault();
   var v = function (id) { return document.getElementById(id).value.trim(); };
-  var data = {nome:v("n"), tel:v("t"), azienda:v("a"), reparto:v("r"), slot:v("s")};
-  var o = {code:"W-" + (1000 + Math.floor(Math.random() * 9000)), nome:data.nome, azienda:data.azienda, reparto:data.reparto, slot:data.slot, note:v("x"),
+  var data = {nome:v("n"), tel:v("t"), azienda:v("a"), ind:v("ind"), reparto:v("r"), slot:v("s")};
+  var o = {code:"W-" + (1000 + Math.floor(Math.random() * 9000)), nome:data.nome, azienda:data.azienda, ind:data.ind, reparto:data.reparto, slot:data.slot, note:v("x"),
     rows:items().map(function (m) { return {q:qty[m.id], name:m.name, price:m.price}; }), tot:total()};
   var fine = function () {
     try { localStorage.setItem("cliente", JSON.stringify(data)); } catch (er) {}
@@ -433,7 +431,7 @@ function submit(e) {
   btn.disabled = true; btn.textContent = "Invio in corso…"; err.hidden = true;
   var body = new URLSearchParams(), c = FORM.campi;
   var put = function (k, val) { if (c[k]) body.append(c[k], val); };
-  put("codice", o.code); put("nome", o.nome); put("tel", data.tel); put("azienda", o.azienda); put("reparto", o.reparto); put("slot", o.slot); put("note", o.note);
+  put("codice", o.code); put("nome", o.nome); put("tel", data.tel); put("azienda", o.azienda); put("indirizzo", o.ind); put("reparto", o.reparto); put("slot", o.slot); put("note", o.note);
   put("ordine", o.rows.map(function (r) { return r.q + " × " + r.name; }).join("\n")); put("totale", eur(o.tot));
   put("consegna", new Date(Date.now() + 864e5).toLocaleDateString("it-IT")); put("consenso", "Sì");
   fetch(FORM.action, {method:"POST", mode:"no-cors", body:body}).then(fine).catch(function () {
@@ -444,6 +442,11 @@ document.addEventListener("click", function (e) {
   var b = e.target.closest("[data-act]"); if (!b) return;
   var act = b.dataset.act, id = b.dataset.id;
   if (act === "privacy") { e.preventDefault(); var pv = document.getElementById("privacy"); pv.open = true; pv.scrollIntoView({behavior:"smooth"}); return; }
+  if (act === "maps") {
+    var q = (document.getElementById("ind").value || document.getElementById("a").value).trim();
+    window.open("https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(q), "_blank", "noopener");
+    return;
+  }
   if (act === "inc") qty[id] = (qty[id] || 0) + 1;
   else if (act === "dec") qty[id] = Math.max(0, (qty[id] || 0) - 1);
   else if (act === "go") { var el = document.getElementById("sec-" + id); if (el) el.scrollIntoView({behavior:"smooth"}); return; }
