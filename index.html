@@ -272,7 +272,10 @@ var MENU = [
  {id:"p1",cat:"Primi",name:"Farro con verdure grigliate",desc:"Farro perlato, zucchine, peperoni, feta e menta",kcal:480,price:9.5,tags:["Vegetariano"]},
  {id:"i1",cat:"Insalate",name:"Tonno, fagioli e cipolla",desc:"Tonno al naturale, cannellini, cipolla di Tropea, rucola",kcal:410,price:9.5,tags:["Pesce","Senza glutine"]},
  {id:"i2",cat:"Insalate",name:"Spinaci, pere e noci",desc:"Spinacino, pera, noci, grana e aceto balsamico",kcal:330,price:9,tags:["Vegetariano","Senza glutine"]},
- {id:"d2",cat:"Dessert",name:"Macedonia di stagione",desc:"Frutta fresca tagliata al momento",kcal:120,price:4.5,tags:["Vegano","Senza glutine"]}
+ {id:"d2",cat:"Dessert",name:"Macedonia di stagione",desc:"Frutta fresca tagliata al momento",kcal:120,price:4.5,tags:["Vegano","Senza glutine"]},
+ {id:"w1",cat:"Bibite",name:"Acqua naturale",desc:"Bottiglietta da 50 cl",kcal:0,price:1.5,tags:["Naturale"]},
+ {id:"w2",cat:"Bibite",name:"Acqua frizzante",desc:"Bottiglietta da 50 cl",kcal:0,price:1.5,tags:["Frizzante"]},
+ {id:"w3",cat:"Bibite",name:"Coca-Cola Zero",desc:"Lattina da 33 cl, senza zucchero",kcal:1,price:2.5,tags:["Senza zucchero"]}
 ];
 // ===========================================
 var EMO = {Bowl:"🥗",Primi:"🍲",Secondi:"🍗",Insalate:"🥬",Dessert:"🍓"};
@@ -325,9 +328,8 @@ function demoNote() { return DEMO ? '<p class="demo"><strong>Versione dimostrati
 function foot() {
   return '<footer class="foot"><details id="privacy"><summary>Informativa privacy</summary>' +
   '<p><strong>Chi siamo.</strong> wellivery è un progetto didattico della Scuola Alberghiera IAL di Serramazzoni. Per qualsiasi richiesta sui tuoi dati scrivi a: ' + esc(PRIVACY.email) + '.</p>' +
-  '<p><strong>Quali dati raccogliamo.</strong> Nome e cognome, telefono, azienda, piano o reparto, fascia di consegna e le note che scrivi.</p>' +
+  '<p><strong>Quali dati raccogliamo.</strong> Nome e cognome, telefono, azienda, piano o reparto, fascia di consegna.</p>' +
   '<p><strong>Perché.</strong> Solo per preparare e consegnare il tuo ordine e per contattarti se serve. Non li usiamo per pubblicità e non li diamo ad altri.</p>' +
-  '<p><strong>Allergie e salute.</strong> Il campo “Note o allergie” può contenere informazioni sulla salute: scrivile solo se vuoi che ne teniamo conto.</p>' +
   '<p><strong>Per quanto tempo.</strong> Conserviamo i dati ' + esc(PRIVACY.conservazione) + '.</p>' +
   '<p><strong>Sul tuo telefono o computer.</strong> Per farti compilare più in fretta la prossima volta, nome, telefono, azienda e reparto restano salvati nel tuo browser e non vengono inviati. Li cancelli eliminando i dati del sito dal browser.</p>' +
   '<p><strong>I tuoi diritti.</strong> Puoi chiedere di vedere, correggere o cancellare i tuoi dati scrivendo all’indirizzo qui sopra.</p>' +
@@ -350,6 +352,7 @@ var ICON = {
  Primi: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M8 12a4 4 0 0 1 8 0M10 15a2 2 0 0 1 4 0"/></svg>',
  Secondi: '<svg viewBox="0 0 24 24"><path d="M14 4a6 6 0 0 1 3 9l-3 2-5-5 2-3zM9 15l-4 4M7 17l-2-2"/></svg>',
  Insalate: '<svg viewBox="0 0 24 24"><path d="M5 19C5 10 10 5 19 5c0 9-5 14-14 14zM5 19l8-8"/></svg>',
+ Bibite: '<svg viewBox="0 0 24 24"><path d="M9 3h6M10 3v3l-2 3v11a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V9l-2-3V3M8 13h8"/></svg>',
  Dessert: '<svg viewBox="0 0 24 24"><path d="M5 13h14l-1.500 7h-11zM7 13a5 5 0 0 1 10 0M12 5V3"/></svg>'
 };
 var query = "", filt = "";
@@ -359,7 +362,7 @@ function chipsHtml() { return '<div class="chips">' + FILTERS.map(function (f) {
 function match(m) {
   var q = query.toLowerCase(), ok = !q || (m.name + " " + m.desc + " " + m.cat).toLowerCase().indexOf(q) > -1;
   if (!filt) return ok;
-  if (filt === "light") return ok && m.kcal < 450;
+  if (filt === "light") return ok && m.kcal < 450 && m.cat !== "Bibite";
   if (filt === "Vegetariano") return ok && (m.tags.indexOf("Vegetariano") > -1 || m.tags.indexOf("Vegano") > -1);
   return ok && m.tags.indexOf(filt) > -1;
 }
@@ -373,7 +376,7 @@ function results() {
   }
   var li = lastIds();
   return (li.length ? rail("Ordina di nuovo", byIds(li)) : rail("Consigliati per iniziare", byIds(["b1", "b2", "s1", "i2"]))) +
-    rail("La selezione dello chef", byIds(CHEF)) + rail("Leggeri, sotto 400 kcal", MENU.filter(function (m) { return m.kcal < 400; })) +
+    rail("La selezione dello chef", byIds(CHEF)) + rail("Leggeri, sotto 400 kcal", MENU.filter(function (m) { return m.kcal < 400 && m.cat !== "Bibite"; })) +
     cats.map(function (c) { return '<section id="sec-' + c + '"><h2>' + c + '</h2><div class="grid">' + MENU.filter(function (m) { return m.cat === c; }).map(card).join("") + '</div></section>'; }).join("");
 }
 function menuView() {
@@ -393,7 +396,6 @@ function formView() {
     '<div><label for="r">Piano / reparto</label><input id="r" placeholder="es. 2° piano, Amministrazione" value="' + esc(saved.reparto || "") + '"></div></div>' +
   '<div style="grid-column:1/-1"><label for="ind">Indirizzo di consegna</label><div class="addr"><input id="ind" required autocomplete="street-address" placeholder="Via, numero civico, città" value="' + esc(saved.ind || "") + '"><button class="btn maps" type="button" data-act="maps">📍 Cerca su Google Maps</button></div><p class="hint">Cerca il posto su Google Maps, copia l’indirizzo completo e incollalo qui.</p></div>' +
   '<label for="s">Fascia di consegna</label><select id="s">' + opts + '</select>' +
-  '<label for="x">Note o allergie</label><textarea id="x" rows="3" placeholder="es. senza noci, salsa a parte"></textarea>' +
   '<label class="chk"><input type="checkbox" id="pv" required><span>Ho letto l’<a href="#privacy" data-act="privacy">informativa privacy</a> e acconsento al trattamento dei miei dati per gestire l’ordine.</span></label>' +
   '<p class="demo" id="err" role="alert" hidden>Non siamo riusciti a inviare l’ordine. Controlla la connessione e riprova.</p>' +
   '<div class="actions"><button class="btn" type="submit">' + (DEMO ? "Vedi riepilogo" : "Conferma prenotazione") + '</button><button class="btn ghost" type="button" data-act="back">Torna al menu</button></div></form>';
@@ -418,7 +420,7 @@ function submit(e) {
   e.preventDefault();
   var v = function (id) { return document.getElementById(id).value.trim(); };
   var data = {nome:v("n"), tel:v("t"), azienda:v("a"), ind:v("ind"), reparto:v("r"), slot:v("s")};
-  var o = {code:"W-" + (1000 + Math.floor(Math.random() * 9000)), nome:data.nome, azienda:data.azienda, ind:data.ind, reparto:data.reparto, slot:data.slot, note:v("x"),
+  var o = {code:"W-" + (1000 + Math.floor(Math.random() * 9000)), nome:data.nome, azienda:data.azienda, ind:data.ind, reparto:data.reparto, slot:data.slot,
     rows:items().map(function (m) { return {q:qty[m.id], name:m.name, price:m.price}; }), tot:total()};
   var fine = function () {
     try { localStorage.setItem("cliente", JSON.stringify(data)); } catch (er) {}
@@ -431,7 +433,7 @@ function submit(e) {
   btn.disabled = true; btn.textContent = "Invio in corso…"; err.hidden = true;
   var body = new URLSearchParams(), c = FORM.campi;
   var put = function (k, val) { if (c[k]) body.append(c[k], val); };
-  put("codice", o.code); put("nome", o.nome); put("tel", data.tel); put("azienda", o.azienda); put("indirizzo", o.ind); put("reparto", o.reparto); put("slot", o.slot); put("note", o.note);
+  put("codice", o.code); put("nome", o.nome); put("tel", data.tel); put("azienda", o.azienda); put("indirizzo", o.ind); put("reparto", o.reparto); put("slot", o.slot);
   put("ordine", o.rows.map(function (r) { return r.q + " × " + r.name; }).join("\n")); put("totale", eur(o.tot));
   put("consegna", new Date(Date.now() + 864e5).toLocaleDateString("it-IT")); put("consenso", "Sì");
   fetch(FORM.action, {method:"POST", mode:"no-cors", body:body}).then(fine).catch(function () {
